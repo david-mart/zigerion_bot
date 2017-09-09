@@ -9,33 +9,42 @@ telegram = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true });
 
 telegram.on("text", ({ from, chat, text }) => {
   const user = utilities.getUserName(from);
-  const { username } = from;
+  const { id } = from;
 
-  if (text.startsWith("/start")) {
-    const ref = db.ref(`/users/${username}`);
-    ref.once("value", snapshot => {
-      if (snapshot.val()) {
+  const ref = db.ref(`/users/${id}`);
+  ref.once("value", snapshot => {
+    if (snapshot.val()) {
+      if (text.startsWith("/start")) {
         telegram.sendMessage(chat.id, `Welcome back ${user}!`);
-      } else {
-        services.setInitialBalance(username);
-        telegram.sendMessage(chat.id, ...messages.welcomeMessage(user));
+      } else if (text.startsWith("/stock")) {
+        services.getCurrencyValues().then(({ data }) => {
+          telegram.sendMessage(chat.id, ...messages.stockMessage(data));
+        });
+      } else if (text.startsWith("/buy")) {
+        const [cmd, symbol, amount] = text.split(" ");
+        if (!utilities.checkSyntax(text)) {
+          telegram.sendMessage(chat.id, ...messages.buyInvalidSyntax);
+        } else if (!utilities.checkSymbol(symbol)) {
+          telegram.sendMessage(chat.id, ...messages.missingSymbol);
+        } else {
+          services.getCurrencyValue(symbol).then(({ data }) => {                        
+            ref.update(utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount), () => {
+
+            });
+          });
+        }
+      } else if (text.startsWith("/wallet")) {
+        telegram.sendMessage(chat.id, ...messages.walletMessage(snapshot.val()));
       }
-    });
-  } else if (text.startsWith("/stock")) {
-    services.getCurrencyValues().then(({ data }) => {
-      telegram.sendMessage(chat.id, ...messages.stockMessage(data));
-    });
-  } else if (text.startsWith("/buy")) {
-    const [cmd, symbol, amount] = text;
-    const ref = db.ref(`/users/${username}`);
-    ref.once("value", snapshot => {
-      if (snapshot.val()) {
-        telegram.sendMessage(chat.id, `Welcome back ${user}!`);
+    } else {
+      if (text.startsWith("/start")) {
+        services.setInitialBalance(from);
+        telegram.sendMessage(chat.id, ...messages.welcomeMessage(user));
       } else {
         telegram.sendMessage(chat.id, ...messages.missingUser(user));
       }
-    });
-  }
+    }
+  });
 });
 
 telegram.on("inline_query", query => {
