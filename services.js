@@ -13,7 +13,7 @@ setInitialBalance = ({ id, username, first_name, last_name, language_code }) =>
       username: username ? username : "",
       first_name: first_name ? first_name : "",
       last_name: last_name ? last_name : "",
-      language_code,
+      language_code: language_code ? language_code : "",
       cash: {
         balance: 100000,
         currency: "USD"

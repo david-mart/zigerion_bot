@@ -42,7 +42,7 @@ module.exports = {
   walletMessage: ({ cash, coins }) => [
     `Your current balance \n\nCash: \n*${cash.currency} ${cash.balance}* 💵\n\nCoins:${keys(
       coins
-    ).map(key => `\n*${key} ${coins[key]}`)}*`,
+    ).map(key => `\n*${key} ${coins[key]}*`).join('')}`,
     MARKDOWN
   ]
 };

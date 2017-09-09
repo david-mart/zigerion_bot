@@ -34,6 +34,7 @@ telegram.on("text", ({ from, chat, text }) => {
           });
         }
       } else if (text.startsWith("/wallet")) {
+        console.log(messages.walletMessage(snapshot.val()));
         telegram.sendMessage(chat.id, ...messages.walletMessage(snapshot.val()));
       }
     } else {
