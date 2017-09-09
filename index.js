@@ -29,7 +29,7 @@ telegram.on("text", ({ from, chat, text }) => {
         } else {
           services.getCurrencyValue(symbol).then(({ data }) => {                        
             ref.update(utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount), () => {
-
+              telegram.sendMessage(chat.id, ...messages.buySuccessMessage(amount, symbol));
             });
           });
         }

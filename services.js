@@ -7,12 +7,12 @@ getCurrencyValues = () =>
   axios.get(config.CRYPTO_API_URL, { params: { limit: 6 } });
 
 setInitialBalance = ({ id, username, first_name, last_name, language_code }) =>
-  db.ref("/users").set({
+  db.ref("/users").update({
     [id]: {
       id,
-      username,
-      first_name,
-      last_name,
+      username: username ? username : "",
+      first_name: first_name ? first_name : "",
+      last_name: last_name ? last_name : "",
       language_code,
       cash: {
         balance: 100000,
