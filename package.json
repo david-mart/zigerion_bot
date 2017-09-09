@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.16.2",
+    "firebase-admin": "^5.2.1",
     "node-telegram-bot-api": "^0.28.0"
   }
 }
