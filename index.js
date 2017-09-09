@@ -27,15 +27,37 @@ telegram.on("text", ({ from, chat, text }) => {
         } else if (!utilities.checkSymbol(symbol)) {
           telegram.sendMessage(chat.id, ...messages.missingSymbol);
         } else {
-          services.getCurrencyValue(symbol).then(({ data }) => {                        
-            ref.update(utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount), () => {
-              telegram.sendMessage(chat.id, ...messages.buySuccessMessage(amount, symbol));
-            });
+          services.getCurrencyValue(symbol).then(({ data }) => {
+            const [{ price_usd }] = data;
+            const { balance } = snapshot.val().cash;
+            if (price_usd * amount <= balance) {
+              ref.update(
+                utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount),
+                () => {
+                  telegram.sendMessage(
+                    chat.id,
+                    ...messages.buySuccessMessage(amount, symbol)
+                  );
+                }
+              );
+            } else {
+              telegram.sendMessage(
+                chat.id,
+                ...messages.buyNotEnoughFunds(
+                  utilities.moduloDivision(balance, price_usd),
+                  symbol
+                )
+              );
+            }
           });
         }
       } else if (text.startsWith("/wallet")) {
-        console.log(messages.walletMessage(snapshot.val()));
-        telegram.sendMessage(chat.id, ...messages.walletMessage(snapshot.val()));
+        telegram.sendMessage(
+          chat.id,
+          ...messages.walletMessage(snapshot.val())
+        );
+      } else if (text.startsWith("/help")) {
+        telegram.sendMessage(chat.id, ...messages.helpMessage);
       }
     } else {
       if (text.startsWith("/start")) {

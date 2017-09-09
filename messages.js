@@ -3,9 +3,10 @@ const { keys } = require("ramda");
 
 module.exports = {
   welcomeMessage: user => [
-    `Welcome, *${user}*! \nSince this is your first time, I'm giving you *100000 USD* to spend on some cryptocurrency. \nMake it last! 🤑`,
+    `Welcome, *${user}*! \nSince this is your first time, I'm giving you *100000 USD* to spend on some cryptocurrency. \nMake it last! 🤑 \n\nUse \`/help\` for available commands` ,
     MARKDOWN
   ],
+  helpMessage: [`⌨️ Available bot commands: \n\`/stock\` - view current cryptocurrency marker values \n\`/wallet\` - view your current balance \n\`/buy\` - purchase coins`, MARKDOWN],
   stockMessage: data => [
     data
       .map(
@@ -20,11 +21,11 @@ module.exports = {
     MARKDOWN
   ],
   missingSymbol: [
-    `Uknown coin! 🚫 \nUse \`/stock\` to see the list of available currencies`,
+    `🚫 Uknown coin! \nUse \`/stock\` to see the list of available currencies`,
     MARKDOWN
   ],
   buyInvalidSyntax: [
-    `Invalid syntax! \n🚫 Example usage: \`/buy BTC 10\``,
+    `🚫 Invalid syntax! \n Example usage: \`/buy BTC 10\``,
     MARKDOWN
   ],
   buyNotEnoughFunds: (amount, symbol) => [
@@ -32,15 +33,15 @@ module.exports = {
     MARKDOWN
   ],
   errorMessage: error => [
-    `Woops! ⚠️\nServer has encountered an error: _${error}_`,
+    `⚠️ Woops! \nServer has encountered an error: _${error}_`,
     MARKDOWN
   ],
   buySuccessMessage: (amount, symbol) => [
-    `Congratulations! 🎉 \nYou have purchased *${amount} ${symbol}*`,
+    `🎉 Congratulations! \nYou have purchased *${amount} ${symbol}*`,
     MARKDOWN
   ],
   walletMessage: ({ cash, coins }) => [
-    `Your current balance \n\nCash: \n*${cash.currency} ${cash.balance}* 💵\n\nCoins:${keys(
+    `🏦 Your current balance \n\n💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n💰 Coins:${keys(
       coins
     ).map(key => `\n*${key} ${coins[key]}*`).join('')}`,
     MARKDOWN
