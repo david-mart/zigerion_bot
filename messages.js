@@ -49,16 +49,16 @@ module.exports = {
     `🎉 Congratulations! \nYou have purchased *${amount} ${symbol}*`,
     MARKDOWN
   ],
-  buySuccessMessage: (amount, symbol) => [
+  sellSuccessMessage: (amount, symbol) => [
     `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`,
     MARKDOWN
   ],
-  walletMessage: ({ cash, coins }) => [
+  walletMessage: ({ cash, coins }, total) => [
     `🏦 Your current balance \n\n💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n💰 Coins:${keys(
       coins
     )
       .map(key => `\n*${key} ${coins[key]}*`)
-      .join("")}`,
+      .join("")}\n\nTotal market value of all your assets is *${total} USD*`,
     MARKDOWN
   ]
 };

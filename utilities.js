@@ -31,9 +31,18 @@ getSellCoinUpdateValue = ({ cash, coins }, data, amount) => {
   };
 };
 
+getTotalWalletValue = ({ cash, coins }, data) => {
+  let total = +cash.balance;
+  data.forEach(({ symbol, price_usd }) => {
+    total += coins[symbol] ? +coins[symbol] * +price_usd : 0;
+  });
+  return total.toFixed(2);
+};
+
 module.exports = {
   getBuyCoinUpdateValue,
   getSellCoinUpdateValue,
+  getTotalWalletValue,
   checkSymbol,
   checkSyntax,
   getUserName,

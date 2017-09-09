@@ -54,34 +54,40 @@ telegram.on("text", ({ from, chat, text }) => {
                 );
               }
             } else {
-              const { coins } = snapshot.val();              
+              const { coins } = snapshot.val();
               if (+coins[symbol] >= +amount) {
                 ref.update(
-                  utilities.getSellCoinUpdateValue(snapshot.val(), data, amount),
+                  utilities.getSellCoinUpdateValue(
+                    snapshot.val(),
+                    data,
+                    amount
+                  ),
                   () => {
                     telegram.sendMessage(
                       chat.id,
-                      ...messages.buySuccessMessage(amount, symbol)
+                      ...messages.sellSuccessMessage(amount, symbol)
                     );
                   }
                 );
               } else {
                 telegram.sendMessage(
                   chat.id,
-                  ...messages.sellNotEnoughFunds(
-                    coins[symbol],
-                    symbol
-                  )
+                  ...messages.sellNotEnoughFunds(coins[symbol], symbol)
                 );
               }
             }
           });
         }
       } else if (text.startsWith("/wallet")) {
-        telegram.sendMessage(
-          chat.id,
-          ...messages.walletMessage(snapshot.val())
-        );
+        services.getCurrencyValues().then(({ data }) => {
+          telegram.sendMessage(
+            chat.id,
+            ...messages.walletMessage(
+              snapshot.val(),
+              utilities.getTotalWalletValue(snapshot.val(), data)
+            )
+          );
+        });
       } else if (text.startsWith("/help")) {
         telegram.sendMessage(chat.id, ...messages.helpMessage);
       }
