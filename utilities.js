@@ -22,8 +22,18 @@ getBuyCoinUpdateValue = ({ cash, coins }, data, amount) => {
   };
 };
 
+getSellCoinUpdateValue = ({ cash, coins }, data, amount) => {
+  const [{ price_usd, symbol }] = data;
+  const { balance } = cash;
+  return {
+    "cash/balance": (+balance + +amount * +price_usd).toFixed(2),
+    [`coins/${symbol}`]: (+propOr(0, symbol, coins) - +amount).toFixed(4)
+  };
+};
+
 module.exports = {
   getBuyCoinUpdateValue,
+  getSellCoinUpdateValue,
   checkSymbol,
   checkSyntax,
   getUserName,

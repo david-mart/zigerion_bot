@@ -20,34 +20,60 @@ telegram.on("text", ({ from, chat, text }) => {
         services.getCurrencyValues().then(({ data }) => {
           telegram.sendMessage(chat.id, ...messages.stockMessage(data));
         });
-      } else if (text.startsWith("/buy")) {
+      } else if (text.startsWith("/buy") || text.startsWith("/sell")) {
         const [cmd, symbol, amount] = text.split(" ");
         if (!utilities.checkSyntax(text)) {
-          telegram.sendMessage(chat.id, ...messages.buyInvalidSyntax);
+          telegram.sendMessage(
+            chat.id,
+            ...messages.invalidSyntax(text.startsWith("/buy") ? "buy" : "sell")
+          );
         } else if (!utilities.checkSymbol(symbol)) {
           telegram.sendMessage(chat.id, ...messages.missingSymbol);
         } else {
           services.getCurrencyValue(symbol).then(({ data }) => {
             const [{ price_usd }] = data;
-            const { balance } = snapshot.val().cash;
-            if (price_usd * amount <= balance) {
-              ref.update(
-                utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount),
-                () => {
-                  telegram.sendMessage(
-                    chat.id,
-                    ...messages.buySuccessMessage(amount, symbol)
-                  );
-                }
-              );
+            if (text.startsWith("/buy")) {
+              const { balance } = snapshot.val().cash;
+              if (price_usd * amount <= balance) {
+                ref.update(
+                  utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount),
+                  () => {
+                    telegram.sendMessage(
+                      chat.id,
+                      ...messages.buySuccessMessage(amount, symbol)
+                    );
+                  }
+                );
+              } else {
+                telegram.sendMessage(
+                  chat.id,
+                  ...messages.buyNotEnoughFunds(
+                    utilities.moduloDivision(balance, price_usd),
+                    symbol
+                  )
+                );
+              }
             } else {
-              telegram.sendMessage(
-                chat.id,
-                ...messages.buyNotEnoughFunds(
-                  utilities.moduloDivision(balance, price_usd),
-                  symbol
-                )
-              );
+              const { coins } = snapshot.val();              
+              if (+coins[symbol] >= +amount) {
+                ref.update(
+                  utilities.getSellCoinUpdateValue(snapshot.val(), data, amount),
+                  () => {
+                    telegram.sendMessage(
+                      chat.id,
+                      ...messages.buySuccessMessage(amount, symbol)
+                    );
+                  }
+                );
+              } else {
+                telegram.sendMessage(
+                  chat.id,
+                  ...messages.sellNotEnoughFunds(
+                    coins[symbol],
+                    symbol
+                  )
+                );
+              }
             }
           });
         }
