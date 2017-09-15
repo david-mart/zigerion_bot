@@ -34,7 +34,7 @@ telegram.on("text", ({ from, chat, text }) => {
             const [{ price_usd }] = data;
             if (text.startsWith("/buy")) {
               const { balance } = snapshot.val().cash;
-              if (price_usd * amount <= balance) {
+              if (price_usd * amount <= balance && amount > 0) {
                 ref.update(
                   utilities.getBuyCoinUpdateValue(snapshot.val(), data, amount),
                   () => {
@@ -55,7 +55,7 @@ telegram.on("text", ({ from, chat, text }) => {
               }
             } else {
               const { coins } = snapshot.val();
-              if (+coins[symbol] >= +amount) {
+              if (+coins[symbol] >= +amount && amount > 0) {
                 ref.update(
                   utilities.getSellCoinUpdateValue(
                     snapshot.val(),
