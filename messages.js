@@ -53,8 +53,12 @@ module.exports = {
     `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`,
     MARKDOWN
   ],
-  walletMessage: ({ cash, coins }, total) => [
-    `🏦 Your current balance \n\n💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n💰 Coins:${keys(
+  walletMessage: ({ cash, coins, username, first_name, last_name }, total) => [
+    `👤 *${first_name ? first_name : ""}* ${last_name
+      ? last_name
+      : ""} ${username
+      ? "(@`" + username + "`)"
+      : ""}\n🏦 Your current balance \n\n💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n💰 Coins:${keys(
       coins
     )
       .map(key => `\n*${key} ${coins[key]}*`)
