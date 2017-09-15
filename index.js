@@ -4,6 +4,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const utilities = require("./utilities");
 const db = require("./database");
 const messages = require("./messages");
+const http = require('http');
 
 telegram = new TelegramBot(config.TELEGRAM_BOT_TOKEN, { polling: true });
 
@@ -123,3 +124,6 @@ telegram.on("inline_query", query => {
   //   }
   // ]);
 });
+
+const server = http.createServer();
+server.listen(process.env.PORT || 5000);
