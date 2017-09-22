@@ -3,8 +3,8 @@ const { keys } = require("ramda");
 
 module.exports = {
   welcomeMessage: user =>
-    `Welcome, *${user}*! \nSince this is your first time, I'm giving you *100000 USD* to spend on some cryptocurrency. \nMake it last! 🤑 \n\nUse \`/help\` for available commands`,
-  helpMessage: `⌨️ Available bot commands: \n\`/stock\` - view current cryptocurrency marker values \n\`/wallet\` - view your current balance \n\`/buy\` - purchase coins\n\`/sell\` - evaluate coins`,
+    `Welcome, *${user}*! \nSince this is your first time, I'm giving you *100000 USD* to spend on some cryptocurrency. \nMake it last! 🤑 \n\nUse /help for available commands`,
+  helpMessage: `⌨️ Available bot commands: \n/stock - view current cryptocurrency marker values \n/wallet - view your current balance \n/buy - purchase coins\n/sell - evaluate coins`,
   stockMessage: data =>
     data
       .map(
@@ -14,9 +14,9 @@ module.exports = {
       .join("\n"),
   missingUser: user =>
     `Hello, *${user}*! \nLooks like you're trying to play around with some cryptocurrency, but you haven't registered yet. \nPlease register by using /start `,
-  missingSymbol: `🚫 Uknown coin! \nUse \`/stock\` to see the list of available currencies`,
+  missingSymbol: `🚫 Uknown coin! \nUse /stock to see the list of available currencies`,
   invalidSyntax: value =>
-    `🚫 Invalid syntax! \n Example usage: \`/${value} BTC 10\``,
+    `🚫 Invalid syntax! \n Example usage: /${value} BTC 10`,
   buyNotEnoughFunds: (amount, symbol) =>
     `You have expensive taste, buddy, but you don't have enough funds for this 🤧\nYou can afford only *${amount} ${symbol}*.`,
   sellNotEnoughFunds: (amount, symbol) =>

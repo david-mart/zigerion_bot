@@ -17,7 +17,7 @@ function Zigerion({ text, from, chat }, snapshot, telegram, testServices) {
   this.ref = snapshot.ref;
   this.services = testServices ? testServices : services;
   [this.command, ...this.args] = this.text.split(" ");
-  this.command = this.command.substring(1);
+  this.command = this.command.split("@")[0].substring(1);
 }
 
 Zigerion.prototype.sendMessage = function(messageText) {
@@ -144,6 +144,21 @@ Zigerion.prototype.purchaseSuccess = function() {
       messages.transactionSuccessMessage[this.command](this.amount, this.coin)
     )
   );
+};
+
+Zigerion.prototype.help = function() {
+  this.sendMessage(messages.helpMessage);
+};
+
+Zigerion.prototype.wallet = function() {
+  services.getCurrencyValues().then(({ data }) => {
+    this.sendMessage(
+      messages.walletMessage(
+        this.user,
+        utilities.getTotalWalletValue(this.user, data)
+      )
+    );
+  });
 };
 
 module.exports = Zigerion;
