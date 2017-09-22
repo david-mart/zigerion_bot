@@ -1,4 +1,4 @@
-const { hasIn } = require("ramda");
+const { hasIn, propOr } = require("ramda");
 const services = require("./services");
 const messages = require("./messages");
 const utilities = require("./utilities");
@@ -7,14 +7,15 @@ const messageOptions = {
   parse_mode: "Markdown"
 };
 
-function Zigerion({ text, from, chat }, snapshot, telegram) {
+function Zigerion({ text, from, chat }, snapshot, telegram, testServices) {
   this.text = text;
   this.chat = chat;
   this.from = from;
   this.user = snapshot.val();
-  this.dispayName = utilities.getUserName(from);
+  this.displayName = utilities.getUserName(from);
   this.telegram = telegram;
-  this.ref = snapshot.ref();
+  this.ref = snapshot.ref;
+  this.services = testServices ? testServices : services;
   [this.command, ...this.args] = this.text.split(" ");
   this.command = this.command.substring(1);
 }
@@ -38,10 +39,10 @@ Zigerion.prototype.sendMessage = function(messageText) {
 Zigerion.prototype.handleMissingUser = function() {
   let message;
   if (this.command === "start") {
-    services.setInitialBalance(this.from);
-    message = messages.welcomeMessage(this.dispayName);
+    this.services.setInitialBalance(this.from);
+    message = messages.welcomeMessage(this.displayName);
   } else {
-    message = messages.missingUser(this.dispayName);
+    message = messages.missingUser(this.displayName);
   }
   this.sendMessage(message);
 };
@@ -53,7 +54,7 @@ Zigerion.prototype.processMessage = function() {
 };
 
 Zigerion.prototype.stock = function() {
-  services.getCurrencyValues().then(({ data }) => {
+  this.services.getCurrencyValues().then(({ data }) => {
     const message = messages.stockMessage(data);
     this.sendMessage(message);
   });
@@ -61,7 +62,7 @@ Zigerion.prototype.stock = function() {
 
 Zigerion.prototype.checkTransaction = function() {
   this.coin = this.args[0];
-  this.amount = this.args[1];
+  this.amount = +this.args[1];
   utilities.checkSyntax(this.text);
   if (!utilities.checkSyntax(this.text)) {
     this.sendMessage(messages.invalidSyntax(this.command));
@@ -75,14 +76,29 @@ Zigerion.prototype.checkTransaction = function() {
 };
 
 Zigerion.prototype.verifyPurchase = function() {
-  const verifyAmount = new Promise((resolve, reject) => {
-    services.getCurrencyValue(symbol).then(({ data }) => {
+  return new Promise((resolve, reject) => {
+    this.services.getCurrencyValue(this.coin).then(({ data }) => {
       this.price_usd = data[0].price_usd;
       const { balance } = this.user.cash;
       if (this.price_usd * this.amount > balance) {
         reject(utilities.moduloDivision(balance, this.price_usd));
       } else {
-        resolve();
+        resolve(data);
+      }
+    });
+  });
+};
+
+Zigerion.prototype.verifySale = function() {
+  return new Promise((resolve, reject) => {
+    this.services.getCurrencyValue(this.coin).then(({ data }) => {
+      this.price_usd = data[0].price_usd;
+      const { balance } = this.user.cash;
+      const coinsOwned = propOr(0, this.coin, this.user.coins);
+      if (coinsOwned >= this.amount) {
+        resolve(data);
+      } else {
+        reject(coinsOwned);
       }
     });
   });
@@ -92,13 +108,42 @@ Zigerion.prototype.buy = function() {
   if (this.checkTransaction()) {
     this.verifyPurchase().then(
       () => {
-        console.log("пдыщь");
+        this.purchaseSuccess();
       },
       avalableAmount => {
-        console.log(avalableAmount);
+        this.sendMessage(messages.buyNotEnoughFunds(avalableAmount, this.coin));
       }
     );
   }
+};
+
+Zigerion.prototype.sell = function() {
+  if (this.checkTransaction()) {
+    this.verifySale().then(
+      () => {
+        this.purchaseSuccess();
+      },
+      coinsOwned => {
+        this.sendMessage(messages.sellNotEnoughFunds(coinsOwned, this.coin));
+      }
+    );
+  }
+};
+
+Zigerion.prototype.purchaseSuccess = function() {
+  const modifiedAmount =
+    this.command === "buy" ? this.amount : this.amount * -1;
+  const newBalance = this.user.cash.balance - modifiedAmount * this.price_usd;
+  const newCoin = +propOr(0, this.coin, this.user.coins) + +modifiedAmount;
+  this.ref.update(
+    {
+      "cash/balance": newBalance.toFixed(2),
+      [`coins/${this.coin}`]: newCoin.toFixed(4)
+    },
+    this.sendMessage(
+      messages.transactionSuccessMessage[this.command](this.amount, this.coin)
+    )
+  );
 };
 
 module.exports = Zigerion;

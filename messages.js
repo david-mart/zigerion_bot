@@ -25,10 +25,12 @@ module.exports = {
       : 0} ${symbol}*.`,
   errorMessage: error =>
     `⚠️ Woops! \nServer has encountered an error: _${error}_`,
-  buySuccessMessage: (amount, symbol) =>
-    `🎉 Congratulations! \nYou have purchased *${amount} ${symbol}*`,
-  sellSuccessMessage: (amount, symbol) =>
-    `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`,
+  transactionSuccessMessage: {
+    buy: (amount, symbol) =>
+      `🎉 Congratulations! \nYou have purchased *${amount} ${symbol}*`,
+    sell: (amount, symbol) =>
+      `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`
+  },
   walletMessage: ({ cash, coins, username, first_name, last_name }, total) =>
     `👤 *${first_name ? first_name : ""}* ${last_name
       ? last_name
@@ -38,6 +40,7 @@ module.exports = {
       coins
     )
       .map(key => `\n*${key} ${coins[key]}*`)
-        .join("")}\n\nTotal market value of all your assets is *${total} USD*`,
-  sketchyMessage: 'Are you trying to do something sketchy there, friend?\n🤔🤔🤔',
+      .join("")}\n\nTotal market value of all your assets is *${total} USD*`,
+  sketchyMessage:
+    "Are you trying to do something sketchy there, friend?\n🤔🤔🤔"
 };

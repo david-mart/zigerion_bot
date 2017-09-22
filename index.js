@@ -107,27 +107,5 @@ telegram.on("text", message => {
   }
 });
 
-telegram.on("inline_query", query => {
-  // console.log(query);
-  // telegram.answerInlineQuery(query.id, [
-  //   {
-  //     type: "article",
-  //     id: "wallet",
-  //     title: "My Wallet",
-  //     input_message_content: {
-  //       message_text: "You're broke, loser"
-  //     }
-  //   },
-  //   {
-  //     type: "article",
-  //     id: "currency_list",
-  //     title: "Crypto Currency price list",
-  //     input_message_content: {
-  //       message_text: "Fuck you bitch"
-  //     }
-  //   }
-  // ]);
-});
-
 // const server = http.createServer();
 // server.listen(process.env.PORT || 5000);

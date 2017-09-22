@@ -1,5 +1,4 @@
 const { allowed_coins } = require("./constants");
-const { propOr } = require("ramda");
 
 getUserName = ({ first_name, last_name, username }) =>
   first_name ? `${first_name}${last_name ? " " + last_name : ""}` : username;
@@ -13,24 +12,6 @@ checkSyntax = text => {
 
 moduloDivision = (a, b) => (a - a % b) / b;
 
-getBuyCoinUpdateValue = ({ cash, coins }, data, amount) => {
-  const [{ price_usd, symbol }] = data;
-  const { balance } = cash;
-  return {
-    "cash/balance": (+balance - +amount * +price_usd).toFixed(2),
-    [`coins/${symbol}`]: (+propOr(0, symbol, coins) + +amount).toFixed(4)
-  };
-};
-
-getSellCoinUpdateValue = ({ cash, coins }, data, amount) => {
-  const [{ price_usd, symbol }] = data;
-  const { balance } = cash;
-  return {
-    "cash/balance": (+balance + +amount * +price_usd).toFixed(2),
-    [`coins/${symbol}`]: (+propOr(0, symbol, coins) - +amount).toFixed(4)
-  };
-};
-
 getTotalWalletValue = ({ cash, coins }, data) => {
   let total = +cash.balance;
   data.forEach(({ symbol, price_usd }) => {
@@ -40,8 +21,6 @@ getTotalWalletValue = ({ cash, coins }, data) => {
 };
 
 module.exports = {
-  getBuyCoinUpdateValue,
-  getSellCoinUpdateValue,
   getTotalWalletValue,
   checkSymbol,
   checkSyntax,
