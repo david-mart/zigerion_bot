@@ -1,4 +1,4 @@
-const { hasIn, propOr } = require("ramda");
+const { hasIn, propOr, path } = require("ramda");
 const services = require("./services");
 const messages = require("./messages");
 const utilities = require("./utilities");
@@ -21,17 +21,33 @@ function Zigerion({ text, from, chat }, snapshot, telegram, testServices) {
 }
 
 Zigerion.prototype.sendMessage = function(messageText) {
-  this.telegram.sendMessage(this.chat.id, messageText, messageOptions).then(
-    ({ chat, date }) => {
-      console.log(
-        `${new Date()}: ${chat.id} ${chat.username} >>> ${this.command}`
-      );
-    },
+  return new Promise(resolve => {
+    this.telegram.sendMessage(this.chat.id, messageText, messageOptions).then(
+      ({ chat, date, message_id }) => {
+        console.log(chat);
+        console.log(
+          `${new Date()}: ${propOr("Direct message", "title", chat)} >>> ${this
+            .displayName} >>> ${this.command}`
+        );
+        resolve(message_id);
+      },
+      ({ response }) => {
+        console.log(
+          `${new Date()}: TELEGRAM ERROR >>> ${response.body.description}`
+        );
+        this.sendMessage(response.body.description);
+      }
+    );
+  });
+};
+
+Zigerion.prototype.deleteMessage = function(id) {
+  this.telegram.deleteMessage(this.chat.id, id).then(
+    () => {},
     ({ response }) => {
       console.log(
         `${new Date()}: TELEGRAM ERROR >>> ${response.body.description}`
       );
-      this.sendMessage(response.body.description);
     }
   );
 };
@@ -157,8 +173,25 @@ Zigerion.prototype.wallet = function() {
         this.user,
         utilities.getTotalWalletValue(this.user, data)
       )
-    );
+    ).then(chat => {
+      this.overwriteWallet(chat);
+    });
   });
+};
+
+Zigerion.prototype.overwriteWallet = function(message_id) {
+  this.ref.update(
+    {
+      [`wallet/${this.chat.id}/id`]: message_id
+    },
+    () => {
+      if (path(["wallet", this.chat.id, "id"], this.user)) {
+        setTimeout(() => {
+          this.deleteMessage(this.user.wallet[this.chat.id].id);
+        }, 1000);
+      }
+    }
+  );
 };
 
 module.exports = Zigerion;
