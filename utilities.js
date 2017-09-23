@@ -14,9 +14,11 @@ moduloDivision = (a, b) => (a - a % b) / b;
 
 getTotalWalletValue = ({ cash, coins }, data) => {
   let total = +cash.balance;
-  data.forEach(({ symbol, price_usd }) => {
-    total += coins[symbol] ? +coins[symbol] * +price_usd : 0;
-  });
+  if (coins) {
+    data.forEach(({ symbol, price_usd }) => {
+      total += coins[symbol] ? +coins[symbol] * +price_usd : 0;
+    });
+  }
   return total.toFixed(2);
 };
 

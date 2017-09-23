@@ -63,6 +63,12 @@ Zigerion.prototype.handleMissingUser = function() {
   this.sendMessage(message);
 };
 
+Zigerion.prototype.start = function () {
+  if (this.user) {
+    this.sendMessage(messages.welcomeBack(this.displayName));
+  }
+};
+
 Zigerion.prototype.processMessage = function() {
   if (hasIn(this.command, this) && this.command !== "processMessage") {
     this[this.command]();
@@ -168,6 +174,7 @@ Zigerion.prototype.help = function() {
 
 Zigerion.prototype.wallet = function() {
   services.getCurrencyValues().then(({ data }) => {
+    console.log(data);
     this.sendMessage(
       messages.walletMessage(
         this.user,

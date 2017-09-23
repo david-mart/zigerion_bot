@@ -12,6 +12,7 @@ module.exports = {
           `_${name}_ (${symbol}): *${price_usd} USD*`
       )
       .join("\n"),
+  welcomeBack: user => `Welcome back, *${user}*!`,
   missingUser: user =>
     `Hello, *${user}*! \nLooks like you're trying to play around with some cryptocurrency, but you haven't registered yet. \nPlease register by using /start `,
   missingSymbol: `🚫 Uknown coin! \nUse /stock to see the list of available currencies`,
@@ -31,16 +32,22 @@ module.exports = {
     sell: (amount, symbol) =>
       `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`
   },
-  walletMessage: ({ cash, coins, username, first_name, last_name }, total) =>
-    `👤 *${first_name ? first_name : ""}* ${last_name
-      ? last_name
-      : ""} ${username
-      ? "(@`" + username + "`)"
-      : ""}\n🏦 Your current balance \n\n💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n💰 Coins:${keys(
-      coins
-    )
-      .map(key => `\n*${key} ${coins[key]}*`)
-      .join("")}\n\nTotal market value of all your assets is *${total} USD*`,
+  walletMessage: ({ cash, coins, username, first_name, last_name }, total) => {
+    let message = `👤 *${first_name ? first_name : ""}* `;
+    message += `${last_name ? last_name : ""} `;
+    message += `${username ? "(@`" + username + "`)" : ""}\n`;
+    message += `🏦 Your current balance \n\n`;
+    message += `💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n`;
+    message += coins
+      ? `💰 Coins: ${keys(coins)
+          .map(key => `\n*${key} ${coins[key]}*`)
+          .join("")}\n\n`
+      : "";
+
+    message += `Total market value of all your assets is *${total} USD*`;
+
+    return message;
+  },
   sketchyMessage:
     "Are you trying to do something sketchy there, friend?\n🤔🤔🤔"
 };
