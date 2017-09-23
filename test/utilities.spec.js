@@ -41,8 +41,6 @@ describe("Utilities", () => {
       LTC: 48.2031
     };
     const actual = zipCoinsArray(coinsArray);
-    console.log(actual);
-    console.log(expected);
     expect(actual).to.deep.equal(expected);
   });
 
@@ -50,6 +48,5 @@ describe("Utilities", () => {
     const expected = "💹 *+10.00%* (+$20)";
     const actual = getPriceDifference(...prices);
     expect(actual).to.equal(expected);
-  })
-
+  });
 });

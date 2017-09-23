@@ -182,7 +182,6 @@ Zigerion.prototype.wallet = function() {
         this.user.balance[symbol] = coin * price_usd;
       }
     });
-    console.log(this.user);
     this.sendMessage(
       messages.walletMessage(
         this.user,

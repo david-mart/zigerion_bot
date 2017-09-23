@@ -1,5 +1,5 @@
 const MARKDOWN = { parse_mode: "Markdown" };
-const { keys } = require("ramda");
+const { keys, path } = require("ramda");
 const moment = require("moment");
 const { getPriceDifference } = require("./utilities");
 
@@ -48,10 +48,10 @@ module.exports = {
       ? `💰 Coins: ${keys(coins)
           .map(
             key =>
-              `\n*${key} ${coins[key]}* ${wallet
+              `\n*${key} ${coins[key]}* ${path(["stock", key], wallet)
                 ? getPriceDifference(
-                    balance[key],
-                    wallet.stock[key] * coins[key]
+                    wallet.stock[key] * coins[key],
+                    balance[key]
                   )
                 : ""}`
           )
