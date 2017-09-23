@@ -1,4 +1,5 @@
 const { allowed_coins } = require("./constants");
+const { reduce } = require("ramda");
 
 getUserName = ({ first_name, last_name, username }) =>
   first_name ? `${first_name}${last_name ? " " + last_name : ""}` : username;
@@ -22,10 +23,31 @@ getTotalWalletValue = ({ cash, coins }, data) => {
   return total.toFixed(2);
 };
 
+zipCoinsArray = reduce((zipped, { price_usd, symbol }) => {
+  zipped[symbol] = +price_usd;
+  return zipped;
+}, {});
+
+getPriceDifference = (old_value, new_value) => {
+  if (old_value === new_value) {
+    return "";
+  } else if (old_value < new_value) {
+    const diff = new_value - old_value;
+    const growth = (diff * 100 / old_value).toFixed(2);
+    return `💹 *+${growth}%* (+$${diff.toFixed(2)})`;
+  } else {
+    const diff = old_value - new_value;
+    const growth = (diff * 100 / old_value).toFixed(2);
+    return `🔻 *-${growth}%* (-$${diff.toFixed(2)})`;
+  }
+};
+
 module.exports = {
   getTotalWalletValue,
   checkSymbol,
   checkSyntax,
   getUserName,
-  moduloDivision
+  moduloDivision,
+  zipCoinsArray,
+  getPriceDifference
 };

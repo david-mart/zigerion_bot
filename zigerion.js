@@ -175,24 +175,32 @@ Zigerion.prototype.help = function() {
 
 Zigerion.prototype.wallet = function() {
   services.getCurrencyValues().then(({ data }) => {
+    this.user.balance = {};
+    data.forEach(({ symbol, price_usd }) => {
+      const coin = path(["coins", symbol], this.user);
+      if (coin) {
+        this.user.balance[symbol] = coin * price_usd;
+      }
+    });
+    console.log(this.user);
     this.sendMessage(
       messages.walletMessage(
         this.user,
         utilities.getTotalWalletValue(this.user, data),
         path(["wallet", this.chat.id], this.user)
       )
-    ).then(chat => {
-      this.overwriteWallet(chat);
+    ).then(message_id => {
+      this.overwriteWallet(message_id, data);
     });
   });
 };
 
-Zigerion.prototype.overwriteWallet = function(message_id) {
+Zigerion.prototype.overwriteWallet = function(message_id, data) {
   this.ref.update(
     {
       [`wallet/${this.chat.id}`]: {
         id: message_id,
-        coins: this.user.coins ? this.user.coins : {},
+        stock: zipCoinsArray(data),
         time: new Date()
       }
     },

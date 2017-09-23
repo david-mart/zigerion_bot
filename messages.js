@@ -1,6 +1,7 @@
 const MARKDOWN = { parse_mode: "Markdown" };
 const { keys } = require("ramda");
 const moment = require("moment");
+const { getPriceDifference } = require("./utilities");
 
 module.exports = {
   welcomeMessage: user =>
@@ -34,8 +35,9 @@ module.exports = {
       `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`
   },
   walletMessage: (
-    { cash, coins, username, first_name, last_name },
-    total, wallet
+    { cash, coins, username, first_name, last_name, balance },
+    total,
+    wallet
   ) => {
     let message = `👤 *${first_name ? first_name : ""}* `;
     message += `${last_name ? last_name : ""} `;
@@ -44,11 +46,21 @@ module.exports = {
     message += `💵 Cash: \n*${cash.currency} ${cash.balance}* \n\n`;
     message += coins
       ? `💰 Coins: ${keys(coins)
-          .map(key => `\n*${key} ${coins[key]}*`)
+          .map(
+            key =>
+              `\n*${key} ${coins[key]}* ${wallet
+                ? getPriceDifference(
+                    balance[key],
+                    wallet.stock[key] * coins[key]
+                  )
+                : ""}`
+          )
           .join("")}\n\n`
       : "";
     message += `📝 Total market value of all your assets is *${total} USD* \n\n`;
-    message += wallet ? `⌚️ Last update: _${moment(wallet.time).fromNow()}_` : "";
+    message += wallet
+      ? `⌚️ Last update: _${moment(wallet.time).fromNow()}_`
+      : "";
 
     return message;
   },
