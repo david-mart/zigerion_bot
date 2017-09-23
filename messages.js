@@ -1,5 +1,6 @@
 const MARKDOWN = { parse_mode: "Markdown" };
 const { keys } = require("ramda");
+const moment = require("moment");
 
 module.exports = {
   welcomeMessage: user =>
@@ -32,7 +33,10 @@ module.exports = {
     sell: (amount, symbol) =>
       `🎊 Very well done! \nYou have sold *${amount} ${symbol}*`
   },
-  walletMessage: ({ cash, coins, username, first_name, last_name }, total) => {
+  walletMessage: (
+    { cash, coins, username, first_name, last_name },
+    total, wallet
+  ) => {
     let message = `👤 *${first_name ? first_name : ""}* `;
     message += `${last_name ? last_name : ""} `;
     message += `${username ? "(@`" + username + "`)" : ""}\n`;
@@ -43,8 +47,8 @@ module.exports = {
           .map(key => `\n*${key} ${coins[key]}*`)
           .join("")}\n\n`
       : "";
-
-    message += `Total market value of all your assets is *${total} USD*`;
+    message += `📝 Total market value of all your assets is *${total} USD* \n\n`;
+    message += wallet ? `⌚️ Last update: _${moment(wallet.time).fromNow()}_` : "";
 
     return message;
   },

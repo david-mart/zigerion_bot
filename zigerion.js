@@ -1,4 +1,4 @@
-const { hasIn, propOr, path } = require("ramda");
+const { hasIn, propOr, path, pathOr } = require("ramda");
 const services = require("./services");
 const messages = require("./messages");
 const utilities = require("./utilities");
@@ -24,7 +24,6 @@ Zigerion.prototype.sendMessage = function(messageText) {
   return new Promise(resolve => {
     this.telegram.sendMessage(this.chat.id, messageText, messageOptions).then(
       ({ chat, date, message_id }) => {
-        console.log(chat);
         console.log(
           `${new Date()}: ${propOr("Direct message", "title", chat)} >>> ${this
             .displayName} >>> ${this.command}`
@@ -63,7 +62,7 @@ Zigerion.prototype.handleMissingUser = function() {
   this.sendMessage(message);
 };
 
-Zigerion.prototype.start = function () {
+Zigerion.prototype.start = function() {
   if (this.user) {
     this.sendMessage(messages.welcomeBack(this.displayName));
   }
@@ -162,9 +161,11 @@ Zigerion.prototype.purchaseSuccess = function() {
       "cash/balance": newBalance.toFixed(2),
       [`coins/${this.coin}`]: newCoin.toFixed(4)
     },
-    this.sendMessage(
-      messages.transactionSuccessMessage[this.command](this.amount, this.coin)
-    )
+    () => {
+      this.sendMessage(
+        messages.transactionSuccessMessage[this.command](this.amount, this.coin)
+      );
+    }
   );
 };
 
@@ -174,11 +175,11 @@ Zigerion.prototype.help = function() {
 
 Zigerion.prototype.wallet = function() {
   services.getCurrencyValues().then(({ data }) => {
-    console.log(data);
     this.sendMessage(
       messages.walletMessage(
         this.user,
-        utilities.getTotalWalletValue(this.user, data)
+        utilities.getTotalWalletValue(this.user, data),
+        path(["wallet", this.chat.id], this.user)
       )
     ).then(chat => {
       this.overwriteWallet(chat);
@@ -189,7 +190,11 @@ Zigerion.prototype.wallet = function() {
 Zigerion.prototype.overwriteWallet = function(message_id) {
   this.ref.update(
     {
-      [`wallet/${this.chat.id}/id`]: message_id
+      [`wallet/${this.chat.id}`]: {
+        id: message_id,
+        coins: this.user.coins ? this.user.coins : {},
+        time: new Date()
+      }
     },
     () => {
       if (path(["wallet", this.chat.id, "id"], this.user)) {

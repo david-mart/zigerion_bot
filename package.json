@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "firebase-admin": "^5.2.1",
+    "moment": "^2.18.1",
     "node-telegram-bot-api": "^0.28.0",
     "ramda": "^0.24.1"
   },
