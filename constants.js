@@ -5,6 +5,6 @@ module.exports = {
     BCH: "bitcoin-cash",
     XRP: "ripple",
     LTC: "litecoin",
-    DASH: "dash"
+    MIOTA: "IOTA"
   }
 };
