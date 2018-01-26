@@ -2,6 +2,7 @@ const { hasIn, propOr, path, pathOr } = require("ramda");
 const services = require("./services");
 const messages = require("./messages");
 const utilities = require("./utilities");
+const { checkSymbol } = utilities;
 
 const messageOptions = {
   parse_mode: "Markdown"
@@ -76,7 +77,8 @@ Zigerion.prototype.processMessage = function() {
 
 Zigerion.prototype.stock = function() {
   this.services.getCurrencyValues().then(({ data }) => {
-    const message = messages.stockMessage(data);
+    const allowed = data.filter((curr) => { return checkSymbol(curr.symbol) })
+    const message = messages.stockMessage(allowed);
     this.sendMessage(message);
   });
 };
