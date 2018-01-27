@@ -77,7 +77,7 @@ Zigerion.prototype.processMessage = function() {
 
 Zigerion.prototype.stock = function() {
   this.services.getCurrencyValues().then(({ data }) => {
-    const allowed = data.filter((curr) => { return checkSymbol(curr.symbol) })
+    const allowed = data.filter( curr => checkSymbol(curr.symbol) );
     const message = messages.stockMessage(allowed);
     this.sendMessage(message);
   });
