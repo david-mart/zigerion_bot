@@ -1,10 +1,10 @@
 const { allowed_coins } = require("./constants");
-const { reduce } = require("ramda");
+const { has, reduce } = require("ramda");
 
 getUserName = ({ first_name, last_name, username }) =>
   first_name ? `${first_name}${last_name ? " " + last_name : ""}` : username;
 
-checkSymbol = symbol => Object.keys(allowed_coins).includes(symbol);
+checkSymbol = symbol => has(symbol, allowed_coins);
 
 checkSyntax = text => {
   const [cmd, symbol, amt] = text.split(" ");

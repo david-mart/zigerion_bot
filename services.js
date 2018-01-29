@@ -4,7 +4,7 @@ const db = require("./database");
 const constants = require("./constants");
 
 getCurrencyValues = () =>
-  axios.get(config.CRYPTO_API_URL, { params: { limit: 6 } });
+  axios.get(config.CRYPTO_API_URL, { params: { limit: 100 } });
 
 setInitialBalance = ({ id, username, first_name, last_name, language_code }) =>
   db.ref("/users").update({
